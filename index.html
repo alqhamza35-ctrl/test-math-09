@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تحدي الرياضيات الفاخر | Premium Math Challenge</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --gradient-bg: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --glass-border: rgba(255, 255, 255, 0.08);
+            --accent-glow: linear-gradient(135deg, #6366f1 0%, #a855f7 100%);
+            --developer-glow: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --success: #10b981;
+            --danger: #ef4444;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Tajawal', sans-serif;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body {
+            background: var(--gradient-bg);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            overflow-x: hidden;
+        }
+
+        /* الحاوية الرئيسية الزجاجية */
+        .glass-panel {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 40px;
+            width: 100%;
+            max-width: 550px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            position: relative;
+            text-align: center;
+        }
+
+        .glass-panel::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 4px;
+            background: var(--accent-glow);
+            border-radius: 24px 24px 0 0;
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            font-weight: 900;
+            background: var(--accent-glow);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+            letter-spacing: -0.5px;
+        }
+
+        .subtitle {
+            color: var(--text-secondary);
+            font-size: 1rem;
+            margin-bottom: 30px;
+        }
+
+        /* شريط التقدم والمؤقت */
+        .stats-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            background: rgba(255, 255, 255, 0.02);
+            padding: 12px 20px;
+            border-radius: 14px;
+            border: 1px solid rgba(255, 255, 255, 0.04);
+        }
+
+        .stat-box {
+            font-size: 1.1rem;
+            font-weight: 700;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            display: block;
+            margin-bottom: 2px;
+        }
+
+        /* المؤقت الدائري */
+        .timer-container {
+            position: relative;
+            width: 60px;
+            height: 60px;
+        }
+
+        .timer-svg {
+            transform: rotate(-90deg);
+            width: 60px;
+            height: 60px;
+        }
+
+        .timer-circle-bg {
+            fill: none;
+            stroke: rgba(255, 255, 255, 0.05);
+            stroke-width: 4;
+        }
+
+        .timer-circle-progress {
+            fill: none;
+            stroke: #a855f7;
+            stroke-width: 4;
+            stroke-dasharray: 176;
+            stroke-dashoffset: 0;
+            stroke-linecap: round;
+        }
+
+        .timer-text {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 1.1rem;
+            font-weight: bold;
+        }
+
+        /* منطقة السؤال */
+        .question-box {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 25px;
+            font-size: 2.5rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        /* مدخل الإجابة */
+        .input-wrapper {
+            position: relative;
+            margin-bottom: 25px;
+        }
+
+        input[type="number"], input[type="text"] {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.2);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 18px;
+            font-size: 1.5rem;
+            color: #fff;
+            text-align: center;
+            outline: none;
+        }
+
+        input[type="text"] {
+            font-size: 1.1rem;
+            padding: 15px;
+        }
+
+        input:focus {
+            border-color: #6366f1;
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.2);
+        }
+
+        /* إلغاء أسهم مدخل الأرقام الافتراضية */
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        /* الأزرار الفخمة */
+        .btn {
+            background: var(--accent-glow);
+            color: white;
+            border: none;
+            border-radius: 16px;
+            padding: 16px 32px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            cursor: pointer;
+            width: 100%;
+            box-shadow: 0 8px 24px rgba(147, 51, 234, 0.3);
+            display: inline-block;
+            text-decoration: none;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 12px 30px rgba(147, 51, 234, 0.5);
+        }
+
+        /* زر المطور المخصص */
+        .btn-developer {
+            background: var(--developer-glow);
+            box-shadow: 0 8px 24px rgba(6, 182, 212, 0.3);
+            margin-bottom: 15px;
+        }
+
+        .btn-developer:hover {
+            box-shadow: 0 12px 30px rgba(6, 182, 212, 0.5);
+        }
+
+        .btn:active {
+            transform: translateY(1px);
+        }
+
+        /* التغذية الراجعة (صح / خطأ) */
+        .feedback {
+            margin-top: 20px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            min-height: 30px;
+            opacity: 0;
+            transform: translateY(10px);
+        }
+
+        .feedback.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .feedback.correct { color: var(--success); }
+        .feedback.wrong { color: var(--danger); }
+
+        /* لوحة الصدارة النهائيّة */
+        .leaderboard {
+            margin-top: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 20px;
+            text-align: right;
+        }
+
+        .leaderboard h3 {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .leaderboard-list {
+            list-style: none;
+        }
+
+        .leaderboard-item {
+            display: flex;
+            justify-content: space-between;
+            background: rgba(255, 255, 255, 0.02);
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+            border: 1px solid rgba(255, 255, 255, 0.02);
+        }
+
+        .leaderboard-item:first-child {
+            background: rgba(234, 179, 8, 0.1);
+            border-color: rgba(234, 179, 8, 0.2);
+            color: #fde047;
+        }
+
+        /* شاشة النهاية */
+        .end-screen h2 {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+        }
+        
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+
+    <div class="glass-panel">
+        <div id="game-view">
+            <h1>تحدي الرياضيات الفاخر</h1>
+            <p class="subtitle">اختبر ذكاءك وسرعتك الحسابية</p>
+
+            <div class="stats-header">
+                <div class="stat-box">
+                    <span class="stat-label">السؤال</span>
+                    <span id="q-progress">1 / 5</span>
+                </div>
+                
+                <div class="timer-container">
+                    <svg class="timer-svg">
+                        <circle class="timer-circle-bg" cx="30" cy="30" r="28"></circle>
+                        <circle class="timer-circle-progress" id="timer-bar" cx="30" cy="30" r="28"></circle>
+                    </svg>
+                    <div class="timer-text" id="timer-countdown">10</div>
+                </div>
+
+                <div class="stat-box">
+                    <span class="stat-label">النقاط</span>
+                    <span id="score-display">0</span>
+                </div>
+            </div>
+
+            <div class="question-box" id="question-display">---</div>
+
+            <div class="input-wrapper">
+                <input type="number" id="answer-input" placeholder="اكتب إجابتك هنا..." autocomplete="off">
+            </div>
+
+            <button class="btn" id="action-btn" onclick="submitAnswer()">تأكيد الإجابة</button>
+            <div class="feedback" id="feedback-msg"></div>
+        </div>
+
+        <div id="end-view" class="hidden end-screen">
+            <h2>🎉 انتهى التحدي</h2>
+            <div class="question-box" style="font-size: 1.8rem; padding: 20px;" id="final-score-box">
+                نقاطك النهائية: 0 / 5
+            </div>
+            
+            <div class="input-wrapper" id="name-saver-zone">
+                <p class="subtitle" style="margin-bottom: 10px;">سجل اسمك في لوحة الصدارة:</p>
+                <input type="text" id="player-name" placeholder="اكتب اسمك الفخم هنا..." autocomplete="off">
+                <button class="btn" onclick="saveScore()" style="margin-top: 15px;">حفظ النتيجة</button>
+            </div>
+
+            <div id="post-save-zone" class="hidden">
+                <a href="https://alqhamza35-ctrl.github.io/hamza-abdelkhalek/" target="_blank" class="btn btn-developer">
+                    🚀 لمعرفة مطور الموقع اضغط هنا
+                </a>
+                <button class="btn" id="restart-btn" onclick="resetGame()" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); box-shadow: none;">اللعب مجدداً</button>
+            </div>
+
+            <div class="leaderboard">
+                <h3>🏆 لوحة الصدارة (أفضل النتائج)</h3>
+                <ul class="leaderboard-list" id="leaderboard-ul">
+                    </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const TOTAL_QUESTIONS = 5;
+        const TIME_LIMIT = 10;
+
+        let score = 0;
+        let currentQuestionIndex = 1;
+        let correctAnswer = 0;
+        let timerInterval = null;
+        let timeLeft = TIME_LIMIT;
+        let isAnswered = false;
+
+        function generateQuestion() {
+            isAnswered = false;
+            document.getElementById("feedback-msg").className = "feedback";
+            document.getElementById("answer-input").value = "";
+            document.getElementById("answer-input").disabled = false;
+            document.getElementById("answer-input").focus();
+            document.getElementById("action-btn").innerText = "تأكيد الإجابة";
+            document.getElementById("q-progress").innerText = `${currentQuestionIndex} / ${TOTAL_QUESTIONS}`;
+
+            let n1 = Math.floor(Math.random() * 20) + 1;
+            let n2 = Math.floor(Math.random() * 20) + 1;
+            const ops = ["+", "-", "*"];
+            let op = ops[Math.floor(Math.random() * ops.length)];
+
+            if (op === "-" && n1 < n2) {
+                [n1, n2] = [n2, n1];
+            }
+
+            if (op === "+") correctAnswer = n1 + n2;
+            if (op === "-") correctAnswer = n1 - n2;
+            if (op === "*") correctAnswer = n1 * n2;
+
+            let opDisplay = op === "*" ? "×" : op;
+            document.getElementById("question-display").innerText = `${n1} ${opDisplay} ${n2}`;
+
+            startTimer();
+        }
+
+        function startTimer() {
+            clearInterval(timerInterval);
+            timeLeft = TIME_LIMIT;
+            const timerBar = document.getElementById("timer-bar");
+            document.getElementById("timer-countdown").innerText = timeLeft;
+            timerBar.style.strokeDashoffset = 0;
+
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                document.getElementById("timer-countdown").innerText = timeLeft;
+
+                let offset = (176 * (TIME_LIMIT - timeLeft)) / TIME_LIMIT;
+                timerBar.style.strokeDashoffset = offset;
+
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    handleTimeout();
+                }
+            }, 1000);
+        }
+
+        function handleTimeout() {
+            isAnswered = true;
+            document.getElementById("answer-input").disabled = true;
+            showFeedback(`⏰ انتهى الوقت! الإجابة الصحيحة هي ${correctAnswer}`, "wrong");
+            prepareNextStep();
+        }
+
+        function submitAnswer() {
+            if (isAnswered) {
+                nextQuestion();
+                return;
+            }
+
+            const inputField = document.getElementById("answer-input");
+            let userAnswer = parseInt(inputField.value);
+
+            if (isNaN(userAnswer)) {
+                showFeedback("⚠️ يرجى إدخال رقم أولاً!", "wrong");
+                return;
+            }
+
+            clearInterval(timerInterval);
+            isAnswered = true;
+            inputField.disabled = true;
+
+            if (userAnswer === correctAnswer) {
+                score++;
+                document.getElementById("score-display").innerText = score;
+                showFeedback("✅ عبقري! إجابة صحيحة تماماً", "correct");
+            } else {
+                showFeedback(`❌ للأسف خاطئة، الإجابة هي ${correctAnswer}`, "wrong");
+            }
+
+            prepareNextStep();
+        }
+
+        function showFeedback(text, status) {
+            const msg = document.getElementById("feedback-msg");
+            msg.innerText = text;
+            msg.className = `feedback show ${status}`;
+        }
+
+        function prepareNextStep() {
+            const btn = document.getElementById("action-btn");
+            if (currentQuestionIndex >= TOTAL_QUESTIONS) {
+                btn.innerText = "عرض النتيجة النهائية";
+            } else {
+                btn.innerText = "السؤال التالي ➔";
+            }
+        }
+
+        function nextQuestion() {
+            if (currentQuestionIndex >= TOTAL_QUESTIONS) {
+                showEndScreen();
+            } else {
+                currentQuestionIndex++;
+                generateQuestion();
+            }
+        }
+
+        function showEndScreen() {
+            document.getElementById("game-view").classList.add("hidden");
+            document.getElementById("end-view").classList.remove("hidden");
+            document.getElementById("final-score-box").innerText = `نقاطك النهائية: ${score} من أصل ${TOTAL_QUESTIONS}`;
+            
+            document.getElementById("name-saver-zone").classList.remove("hidden");
+            document.getElementById("post-save-zone").classList.add("hidden");
+            
+            updateLeaderboardUI();
+        }
+
+        function saveScore() {
+            const nameInput = document.getElementById("player-name");
+            let name = nameInput.value.trim();
+            if (name === "") name = "لاعب مجهول الفخامة";
+
+            let scores = JSON.parse(localStorage.getItem("math_leaderboard")) || [];
+            scores.push({ name: name, score: score, date: new Date().toLocaleDateString('ar-EG') });
+            
+            scores.sort((a, b) => b.score - a.score);
+            scores = scores.slice(0, 5);
+
+            localStorage.setItem("math_leaderboard", JSON.stringify(scores));
+            
+            nameInput.value = "";
+            document.getElementById("name-saver-zone").classList.add("hidden");
+            document.getElementById("post-save-zone").classList.remove("hidden");
+            
+            updateLeaderboardUI();
+        }
+
+        function updateLeaderboardUI() {
+            const ul = document.getElementById("leaderboard-ul");
+            ul.innerHTML = "";
+            let scores = JSON.parse(localStorage.getItem("math_leaderboard")) || [];
+
+            if (scores.length === 0) {
+                ul.innerHTML = `<li class="leaderboard-item" style="color: var(--text-secondary)">لا توجد نتائج مسجلة حتى الآن. كن أول الفائزين!</li>`;
+                return;
+            }
+
+            scores.forEach((item, index) => {
+                ul.innerHTML += `
+                    <li class="leaderboard-item">
+                        <span>${index + 1}. 🎉 ${item.name}</span>
+                        <strong>${item.score} / ${TOTAL_QUESTIONS}</strong>
+                    </li>
+                `;
+            });
+        }
+
+        function resetGame() {
+            score = 0;
+            currentQuestionIndex = 1;
+            document.getElementById("score-display").innerText = score;
+            document.getElementById("end-view").classList.add("hidden");
+            document.getElementById("game-view").classList.remove("hidden");
+            generateQuestion();
+        }
+
+        window.onload = generateQuestion;
+
+        document.getElementById("answer-input").addEventListener("keyup", function(event) {
+            if (event.key === "Enter") {
+                submitAnswer();
+            }
+        });
+    </script>
+</body>
+</html>
